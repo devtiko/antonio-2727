@@ -1,12 +1,12 @@
 import bcrypt from "bcryptjs";
 import { Storage } from "@/common/lib";
 import { ONE_DAY_MS } from "@/common/constants";
-import type { User, Session } from "@/common/types";
+import type { User, Session, UUID } from "@/common/types";
 import type { LoginInput, RegisterInput } from "./types/requests";
 
 export class ApiService {
 	static async login(body: LoginInput) {
-		const users = Storage.get<Record<string, User>>("users");
+		const users = await Storage.get<Record<string, User>>("users");
 		const userByEmail = users?.[body?.email];
 
 		if (!userByEmail) {
@@ -28,7 +28,7 @@ export class ApiService {
 			expires_at: Date.now() + ONE_DAY_MS,
 		};
 
-		Storage.set("session", newSession);
+		await Storage.set<Session>("session", newSession);
 
 		return {
 			user: userByEmail,
@@ -36,21 +36,21 @@ export class ApiService {
 		};
 	}
 
-	static me(): User {
-		const session = Storage.get<Session>("session");
+	static async me(): Promise<User> {
+		const session = await Storage.get<Session>("session");
 
 		if (!session) {
 			throw new Error("No autenticado");
 		}
 
-		const hasExpired = session.expires_at < Date.now();
+		const hasExpired = session?.expires_at < Date.now();
 
 		if (hasExpired) {
 			Storage.remove("session");
 			throw new Error("Sesión expirada");
 		}
 
-		const users = Storage.get<Record<string, User>>("users");
+		const users = await Storage.get<Record<string, User>>("users");
 		const userById = users?.[session?.user_id];
 
 		if (!users || !userById) {
@@ -68,7 +68,7 @@ export class ApiService {
 		}
 
 		const usersEmailKey =
-			Storage.get<Record<string, string>>("users_email_key");
+			await Storage.get<Record<string, UUID>>("users_email_key");
 		const existsByEmail = !!usersEmailKey?.[body?.email];
 
 		if (existsByEmail) {
@@ -92,11 +92,19 @@ export class ApiService {
 			expires_at: Date.now() + ONE_DAY_MS,
 		};
 
-		const users = Storage.get<Record<string, User>>("users");
+		const users = await Storage.get<Record<string, User>>("users");
 
-		Storage.set("users", { ...users, [userId]: { ...newUser, password: pwd } });
-		Storage.set("users_email_key", { ...usersEmailKey, [body?.email]: userId });
-		Storage.set("session", newSession);
+		Storage.set<Record<string, User>>("users", {
+			...users,
+			[userId]: { ...newUser, password: pwd },
+		});
+
+		Storage.set<Record<string, UUID>>("users_email_key", {
+			...usersEmailKey,
+			[body?.email]: userId,
+		});
+
+		Storage.set<Session>("session", newSession);
 
 		return newUser;
 	}
