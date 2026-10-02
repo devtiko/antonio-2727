@@ -2,8 +2,8 @@ export type UUID = `${string}-${string}-${string}-${string}-${string}`;
 
 export interface User {
 	id: UUID;
-	fist_name: string;
-	last_name: string;
+	first_name: string;
+	last_name?: string;
 	email: string;
 	password?: string;
 	created_at: string;

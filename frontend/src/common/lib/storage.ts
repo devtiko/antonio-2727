@@ -11,7 +11,7 @@ export class Storage {
 	static async set<T>(key: string, value: T): Promise<void> {
 		const serialized = JSON.stringify(value);
 		const encrypted = await Crypto.encrypt(serialized);
-		return localStorage.setItem(key, JSON.stringify(encrypted));
+		return localStorage.setItem(key, encrypted);
 	}
 
 	static remove(key: string): void {

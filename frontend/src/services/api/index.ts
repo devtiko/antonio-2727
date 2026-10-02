@@ -3,14 +3,15 @@ import { Storage } from "@/common/lib";
 import { ONE_DAY_MS } from "@/common/constants";
 import type { User, Session, UUID } from "@/common/types";
 import type { LoginInput, RegisterInput } from "./types/requests";
+import type { LoginResponse } from "./types/responses";
 
 export class ApiService {
-	static async login(body: LoginInput) {
+	static async login(body: LoginInput): Promise<LoginResponse> {
 		const users = await Storage.get<Record<string, User>>("users");
 		const userByEmail = users?.[body?.email];
 
 		if (!userByEmail) {
-			throw new Error("Credenciales inválidas");
+			throw new Error("Correo y/o contraseña incorrectos");
 		}
 
 		const pwdValid = userByEmail?.password
@@ -18,7 +19,7 @@ export class ApiService {
 			: false;
 
 		if (!pwdValid) {
-			throw new Error("Credenciales inválidas");
+			throw new Error("Correo y/o contraseña incorrectos");
 		}
 
 		const newSession: Session = {
@@ -61,7 +62,7 @@ export class ApiService {
 	}
 
 	static async register(body: RegisterInput): Promise<User> {
-		const { confirm_password, password, ...data } = body;
+		const { confirm_password, password, first_name, last_name, email } = body;
 
 		if (confirm_password !== password) {
 			throw new Error("Las contraseñas no coinciden");
@@ -69,7 +70,7 @@ export class ApiService {
 
 		const usersEmailKey =
 			await Storage.get<Record<string, UUID>>("users_email_key");
-		const existsByEmail = !!usersEmailKey?.[body?.email];
+		const existsByEmail = !!usersEmailKey?.[email];
 
 		if (existsByEmail) {
 			throw new Error("Correo ya registrado");
@@ -79,16 +80,21 @@ export class ApiService {
 		const salt = await bcrypt.genSalt();
 		const pwd = await bcrypt.hash(password, salt);
 
-		const newUser = {
-			...data,
+		const now = new Date().toISOString();
+
+		const newUser: User = {
 			id: userId,
-			email: body.email,
+			first_name,
+			last_name,
+			email,
+			created_at: now,
+			updated_at: now,
 		};
 
 		const newSession = {
 			id: crypto.randomUUID(),
 			user_id: userId,
-			created_at: new Date().toISOString(),
+			created_at: now,
 			expires_at: Date.now() + ONE_DAY_MS,
 		};
 
@@ -101,11 +107,15 @@ export class ApiService {
 
 		Storage.set<Record<string, UUID>>("users_email_key", {
 			...usersEmailKey,
-			[body?.email]: userId,
+			[email]: userId,
 		});
 
 		Storage.set<Session>("session", newSession);
 
 		return newUser;
+	}
+
+	static logout() {
+		Storage.remove("session");
 	}
 }
