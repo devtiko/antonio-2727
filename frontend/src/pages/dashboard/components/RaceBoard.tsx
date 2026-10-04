@@ -4,10 +4,10 @@ import { RunnerCard } from "./RunnerCard";
 import { RUNNERS, type Runner } from "../mock";
 
 interface RaceBoardProps {
-	onSelect: (runner: Runner) => void;
+	onSelectRunner: (runner: Runner) => void;
 }
 
-export function RaceBoard({ onSelect }: RaceBoardProps) {
+export function RaceBoard({ onSelectRunner }: RaceBoardProps) {
 	return (
 		<section className="flex flex-col gap-4 lg:col-span-8">
 			<div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
@@ -43,8 +43,12 @@ export function RaceBoard({ onSelect }: RaceBoardProps) {
 				</div>
 			</div>
 			<div className="flex flex-col gap-2.5">
-				{RUNNERS.map((runner) => (
-					<RunnerCard key={runner.lane} runner={runner} onSelect={onSelect} />
+				{RUNNERS.map((runner, index) => (
+					<RunnerCard
+						runner={runner}
+						key={`runner_${index}`}
+						onSelect={() => onSelectRunner(runner)}
+					/>
 				))}
 			</div>
 		</section>

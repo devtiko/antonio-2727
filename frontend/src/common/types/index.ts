@@ -8,6 +8,7 @@ export interface User {
 	password?: string;
 	created_at: string;
 	updated_at: string;
+	balance: number;
 }
 
 export interface Session {

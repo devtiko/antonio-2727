@@ -4,29 +4,19 @@ import {
 	TrendingUpIcon,
 	Wallet01Icon,
 } from "@hugeicons/core-free-icons";
+import { useAuthContext } from "@/common/context/AuthContext";
+import { KPI_STATS } from "../mock";
 import { KpiStatCard } from "./KpiStatCard";
 
-interface KpiStatGridProps {
-	balance: number;
-	gain: string;
-	roi: string;
-	activeBets: number;
-	countdown: string;
-}
+export function KpiStatGrid() {
+	const { user } = useAuthContext();
 
-export function KpiStatGrid({
-	balance,
-	gain,
-	roi,
-	activeBets,
-	countdown,
-}: KpiStatGridProps) {
 	return (
 		<div className="grid grid-cols-2 gap-4 pt-6 lg:grid-cols-4">
 			<KpiStatCard
 				title="Saldo Disponible"
 				icon={Wallet01Icon}
-				value={balance.toFixed(2)}
+				value={(user?.balance ?? 0).toFixed(2)}
 				prefix="$"
 				suffix="MXN"
 				caption="SnailPay Verified"
@@ -34,14 +24,14 @@ export function KpiStatGrid({
 			<KpiStatCard
 				title="Ganancias del Día"
 				icon={Ticket01Icon}
-				value={gain}
+				value={`+$${KPI_STATS.gain.toFixed(2)}`}
 				suffix="MXN"
-				caption={`${roi} ROI de hoy`}
+				caption={`+${KPI_STATS.roi}% ROI de hoy`}
 			/>
 			<KpiStatCard
 				title="Apuestas Activas"
 				icon={TrendingUpIcon}
-				value={String(activeBets)}
+				value={String(KPI_STATS.active_bets)}
 				suffix="tickets en juego"
 				caption="Próxima ronda GP Lechuga"
 				accent="text-jackpot"
@@ -49,7 +39,7 @@ export function KpiStatGrid({
 			<KpiStatCard
 				title="Próxima Salida"
 				icon={AlarmClockIcon}
-				value={countdown}
+				value={KPI_STATS.next_race_time}
 				caption="Mañana próxima carrera"
 				accent="text-telemetry"
 			/>

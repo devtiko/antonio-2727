@@ -14,12 +14,11 @@ import {
 	Settings01Icon,
 	UserCircle02Icon,
 } from "@hugeicons/core-free-icons";
+import { useAuthContext } from "@/common/context/AuthContext";
 
-interface UserMenuProps {
-	onLogout: () => void;
-}
+export const UserMenu = () => {
+	const { user, logout } = useAuthContext();
 
-export const UserMenu = ({ onLogout }: UserMenuProps) => {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger
@@ -29,15 +28,17 @@ export const UserMenu = ({ onLogout }: UserMenuProps) => {
 					</Button>
 				}
 			/>
-			<DropdownMenuContent align="end" sideOffset={8} className="w-56">
+			<DropdownMenuContent sideOffset={16} className="w-56">
 				<DropdownMenuGroup>
 					<DropdownMenuLabel>
 						<span className="block font-serif text-sm font-semibold tracking-tight text-emphasis">
-							Mateo Fernando Caparazón Vargas
+							{user?.first_name} {user?.last_name}
 						</span>
-						<span className="mt-0.5 block font-sans text-xs font-normal text-muted-foreground">
-							mateo.vargas@turbosnail.bet
-						</span>
+						{user?.email && (
+							<span className="mt-0.5 block font-sans text-xs font-normal text-muted-foreground">
+								{user?.email}
+							</span>
+						)}
 					</DropdownMenuLabel>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem>
@@ -49,7 +50,7 @@ export const UserMenu = ({ onLogout }: UserMenuProps) => {
 						Ajustes
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
-					<DropdownMenuItem variant="destructive" onClick={onLogout}>
+					<DropdownMenuItem variant="destructive" onClick={logout}>
 						<HugeiconsIcon icon={Logout01Icon} strokeWidth={2} />
 						Cerrar sesión
 					</DropdownMenuItem>

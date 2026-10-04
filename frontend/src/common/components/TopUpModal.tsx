@@ -117,11 +117,11 @@ export function TopUpModal({ open, onOpenChange, onConfirm }: TopUpModalProps) {
 				<div className="flex flex-col gap-2">
 					<Label>Monto Rápido (MXN)</Label>
 					<div className="grid grid-cols-4 gap-2">
-						{AMOUNTS.map((option) => (
+						{AMOUNTS.map((option, index) => (
 							<Button
 								size="lg"
-								key={option}
 								type="button"
+								key={`pay_amount_${index}`}
 								onClick={() => setValue("amount", option)}
 								variant={amountValue === option ? "default" : "outline"}
 								className={`${

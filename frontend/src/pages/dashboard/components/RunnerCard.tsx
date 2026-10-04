@@ -2,7 +2,7 @@ import { RANK_COLOR, type Runner } from "../mock";
 
 interface RunnerCardProps {
 	runner: Runner;
-	onSelect: (runner: Runner) => void;
+	onSelect: () => void;
 }
 
 export function RunnerCard({ runner, onSelect }: RunnerCardProps) {
@@ -11,7 +11,7 @@ export function RunnerCard({ runner, onSelect }: RunnerCardProps) {
 	return (
 		<button
 			type="button"
-			onClick={() => onSelect(runner)}
+			onClick={() => onSelect()}
 			className="flex cursor-pointer flex-col justify-between rounded-xl bg-surface-low p-3.5 transition-all hover:bg-muted sm:flex-row sm:items-center"
 		>
 			<div className="flex items-center gap-3">
@@ -43,7 +43,7 @@ export function RunnerCard({ runner, onSelect }: RunnerCardProps) {
 						{runner.form.join(" - ")}
 					</span>
 				</div>
-				<div className="group/odds flex min-w-[72px] flex-col items-center rounded-xl bg-surface-high px-4 py-2 transition-all hover:bg-surface-highest">
+				<div className="group/odds flex min-w-18 flex-col items-center rounded-xl bg-surface-high px-4 py-2 transition-all hover:bg-surface-highest">
 					<span className="text-[10px] font-bold uppercase tracking-wider">
 						GANA
 					</span>

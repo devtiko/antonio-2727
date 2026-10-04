@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useMemo } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { BoltIcon } from "@hugeicons/core-free-icons";
 import { Controller, useForm, useWatch } from "react-hook-form";
@@ -18,46 +18,29 @@ import {
 	InputGroupAddon,
 	InputGroupInput,
 } from "@/common/ui/input-group";
-import { raceTicketSchema, type RaceTicketForm } from "../schemas";
-import type { Runner } from "../mock";
-
-const STAKE_PRESETS = [10, 25, 50];
+import { formatMoney } from "../utils";
+import { raceTicketSchema } from "../schemas";
+import { RACE_TICKET_AMOUNTS, type Runner } from "../mock";
+import type { TicketInput } from "@/services/api/types";
 
 interface QuickBetslipProps {
-	runner: Runner;
-	stake: number;
-	onStakeChange: (value: number) => void;
-	totalReturn: number;
-	profit: number;
-	onPlaceBet: () => void;
+	runner: Runner | null;
+	onPlaceBet: (data: TicketInput) => void;
 }
 
-function formatMoney(value: number): string {
-	return value.toLocaleString("en-US", {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	});
-}
-
-export function RaceTicket({
-	runner,
-	stake,
-	onStakeChange,
-	totalReturn,
-	profit,
-	onPlaceBet,
-}: QuickBetslipProps) {
-	const { control, handleSubmit, setValue } = useForm<RaceTicketForm>({
-		resolver: valibotResolver(raceTicketSchema),
+export function RaceTicket({ runner, onPlaceBet }: QuickBetslipProps) {
+	const { control, setValue, handleSubmit } = useForm<TicketInput>({
 		mode: "onChange",
-		defaultValues: { amount: stake },
+		resolver: valibotResolver(raceTicketSchema),
+		defaultValues: { amount: RACE_TICKET_AMOUNTS[0] },
 	});
-
-	useEffect(() => {
-		setValue("amount", stake, { shouldValidate: true });
-	}, [stake, setValue]);
 
 	const currentAmount = useWatch({ control, name: "amount" });
+
+	const { total, profit } = useMemo(() => {
+		const total = currentAmount * (runner?.odds || 0);
+		return { total, profit: total - currentAmount };
+	}, [currentAmount, runner?.odds]);
 
 	return (
 		<Card className="shadow-xl ring-0 lg:col-span-4">
@@ -68,45 +51,44 @@ export function RaceTicket({
 			</CardHeader>
 
 			<CardContent className="gap-6">
-				<div className="flex flex-col gap-2 rounded-xl bg-muted p-4">
-					<div className="flex items-center justify-between">
-						<span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-							Caracol Seleccionado
-						</span>
-						<span className="text-[11px] font-bold uppercase tracking-wider text-primary">
-							{runner.odds.toFixed(2)}x
-						</span>
+				{runner && (
+					<div className="flex flex-col gap-2 rounded-xl bg-muted p-4">
+						<div className="flex items-center justify-between">
+							<span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+								Caracol Seleccionado
+							</span>
+							<span className="text-[11px] font-bold uppercase tracking-wider text-primary">
+								{runner?.odds.toFixed(2)}x
+							</span>
+						</div>
+						<div className="flex items-center justify-between">
+							<span className="font-serif text-xl font-semibold tracking-tight text-emphasis">
+								{runner?.name}
+							</span>
+							<span className="text-xs text-muted-foreground">
+								{`L${runner?.lane}`}
+							</span>
+						</div>
 					</div>
-					<div className="flex items-center justify-between">
-						<span className="font-serif text-xl font-semibold tracking-tight text-emphasis">
-							{runner.name}
-						</span>
-						<span className="text-xs text-muted-foreground">
-							{`L${runner.lane}`}
-						</span>
-					</div>
-				</div>
+				)}
 
 				<div className="flex flex-col gap-4">
 					<Label>Monto de Apuesta (MXN)</Label>
 					<div className="grid grid-cols-3 gap-4">
-						{STAKE_PRESETS.map((preset) => (
+						{RACE_TICKET_AMOUNTS.map((amount, index) => (
 							<Button
-								key={preset}
-								type="button"
 								size="lg"
-								variant={currentAmount === preset ? "default" : "outline"}
-								onClick={() => {
-									setValue("amount", preset, { shouldValidate: true });
-									onStakeChange(preset);
-								}}
+								type="button"
+								key={`ticket_amount_${index}`}
+								variant={currentAmount === amount ? "default" : "outline"}
+								onClick={() => setValue("amount", amount)}
 								className={
-									currentAmount === preset
+									currentAmount === amount
 										? "shadow-[0_0_12px_color-mix(in_srgb,var(--primary)_30%,transparent)]"
 										: ""
 								}
 							>
-								${preset}
+								${amount}
 							</Button>
 						))}
 					</div>
@@ -126,11 +108,12 @@ export function RaceTicket({
 											{...field}
 											id="amount"
 											type="number"
+											placeholder="Ingresa un monto"
+											aria-label="Monto Rápido (MXN)"
 											aria-invalid={fieldState.invalid}
 											onChange={(event) => {
 												const value = Number(event.target.value) || 0;
 												field.onChange(value);
-												onStakeChange(value);
 											}}
 										/>
 										<InputGroupAddon align="inline-end">MXN</InputGroupAddon>
@@ -156,7 +139,7 @@ export function RaceTicket({
 							Retorno Total:
 						</span>
 						<span className="font-serif text-3xl font-bold text-primary">
-							${formatMoney(totalReturn)}
+							${formatMoney(total)}
 						</span>
 					</div>
 				</div>

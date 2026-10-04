@@ -128,9 +128,24 @@ export const DONUT_STATS = {
 	lossesPct: 40,
 };
 
+export const RACE_TICKET_AMOUNTS = [10, 25, 50];
 export const SNAIL_PAY_AMOUNTS = [20, 50, 100, 250];
 
-export const USER = {
-	name: "Mateo Fernando Caparazón Vargas",
-	email: "mateo.vargas@turbosnail.bet",
+export interface KpiStats {
+	gain: number;
+	roi: number;
+	active_bets: number;
+	next_race_time: string;
+	races: {
+		total: number;
+		completed: number;
+	};
+}
+
+export const KPI_STATS: KpiStats = {
+	gain: 340.5,
+	roi: 28.4,
+	active_bets: 2,
+	next_race_time: "10:30",
+	races: { total: 6, completed: 6 },
 };

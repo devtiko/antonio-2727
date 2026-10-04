@@ -6,11 +6,12 @@ export interface LoginInput {
 	remember: boolean;
 }
 
-export type RegisterInput = Pick<
-	User,
-	"first_name" | "last_name" | "email"
-> & {
+export type RegisterInput = Pick<User, "first_name" | "last_name" | "email"> & {
 	password: string;
 	confirm_password: string;
 	accepted_terms: boolean;
+};
+
+export type TicketInput = {
+	amount: number;
 };

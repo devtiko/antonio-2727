@@ -7,9 +7,9 @@ export function RacingTimeline() {
 				Cronología Oficial • Jornada Completa (6/6)
 			</span>
 			<div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-				{RACE_TIMELINE.map((race) => (
+				{RACE_TIMELINE.map((race, index) => (
 					<div
-						key={race.code}
+						key={`race_timeline_${index}`}
 						className="flex items-center gap-1.5 rounded-lg bg-muted p-1.5 text-xs"
 					>
 						<span className="font-bold text-primary">{race.code}:</span>

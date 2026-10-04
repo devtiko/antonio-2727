@@ -3,9 +3,11 @@ import { toast } from "sonner";
 import { ApiService } from "@/services/api";
 import { useNavigate } from "react-router";
 import type { RegisterInput } from "@/services/api/types";
+import { useAuthContext } from "@/common/context/AuthContext";
 
 export const useRegister = () => {
 	const navigate = useNavigate();
+	const { updateUser } = useAuthContext();
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const [isPendingRegister, setIsPendingRegister] = useState(false);
@@ -13,13 +15,14 @@ export const useRegister = () => {
 	const handleRegister = async (data: RegisterInput) => {
 		try {
 			setIsPendingRegister(true);
-			const user = await ApiService.register(data);
+			const { user } = await ApiService.register(data);
 			toast.success(
 				`¡Bienvenido a la pista, ${user?.first_name || "Corredor"}!`,
 				{
 					description: "Tu cuenta ha sido creada con éxito.",
 				},
 			);
+			updateUser(user);
 			navigate("/dashboard", { replace: true });
 		} catch (e: unknown) {
 			const isKnowError = e instanceof Error;

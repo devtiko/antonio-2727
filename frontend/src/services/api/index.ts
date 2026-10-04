@@ -7,15 +7,23 @@ import type { LoginResponse } from "./types/responses";
 
 export class ApiService {
 	static async login(body: LoginInput): Promise<LoginResponse> {
-		const users = await Storage.get<Record<string, User>>("users");
-		const userByEmail = users?.[body?.email];
+		const usersEmailKey =
+			await Storage.get<Record<string, UUID>>("users_email_key");
+		const userByEmail = usersEmailKey?.[body?.email];
 
 		if (!userByEmail) {
 			throw new Error("Correo y/o contraseña incorrectos");
 		}
 
-		const pwdValid = userByEmail?.password
-			? await bcrypt.compare(body?.password, userByEmail.password)
+		const users = await Storage.get<Record<UUID, User>>("users");
+		const userById = users?.[userByEmail];
+
+		if (!userById) {
+			throw new Error("Correo y/o contraseña incorrectos");
+		}
+
+		const pwdValid = userById?.password
+			? await bcrypt.compare(body?.password, userById.password)
 			: false;
 
 		if (!pwdValid) {
@@ -24,15 +32,19 @@ export class ApiService {
 
 		const newSession: Session = {
 			id: crypto.randomUUID(),
-			user_id: userByEmail?.id,
+			user_id: userById?.id,
 			created_at: new Date().toISOString(),
 			expires_at: Date.now() + ONE_DAY_MS,
 		};
 
 		await Storage.set<Session>("session", newSession);
 
+		if (userById?.password) {
+			delete userById.password;
+		}
+
 		return {
-			user: userByEmail,
+			user: userById,
 			session: newSession,
 		};
 	}
@@ -51,17 +63,21 @@ export class ApiService {
 			throw new Error("Sesión expirada");
 		}
 
-		const users = await Storage.get<Record<string, User>>("users");
+		const users = await Storage.get<Record<UUID, User>>("users");
 		const userById = users?.[session?.user_id];
 
 		if (!users || !userById) {
 			throw new Error("Usuario no encontrado");
 		}
 
+		if (userById?.password) {
+			delete userById.password;
+		}
+
 		return userById;
 	}
 
-	static async register(body: RegisterInput): Promise<User> {
+	static async register(body: RegisterInput): Promise<LoginResponse> {
 		const { confirm_password, password, first_name, last_name, email } = body;
 
 		if (confirm_password !== password) {
@@ -87,6 +103,7 @@ export class ApiService {
 			first_name,
 			last_name,
 			email,
+			balance: 0,
 			created_at: now,
 			updated_at: now,
 		};
@@ -112,7 +129,10 @@ export class ApiService {
 
 		Storage.set<Session>("session", newSession);
 
-		return newUser;
+		return {
+			user: newUser,
+			session: newSession,
+		};
 	}
 
 	static logout() {
