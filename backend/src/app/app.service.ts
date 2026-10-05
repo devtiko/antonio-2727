@@ -1,12 +1,7 @@
+import { APPROVED_CARD } from "./mock";
 import { MESSAGE_CODE } from "@common/constants";
 import { PaymentRequiredError } from "@common/exceptions";
 import type { TopUpDto } from "./dto";
-
-const APPROVED_CARD = {
-	card_number: "1234123412341234",
-	expiration_date: "12/26",
-	cvv: "543",
-} as const;
 
 export class AppService {
 	topUp = (payload: TopUpDto) => {
