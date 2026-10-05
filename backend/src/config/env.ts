@@ -5,7 +5,7 @@ export const ENV = createEnv({
 	schema: {
 		shared: {
 			PORT: v.pipe(v.string(), v.toNumber(), v.integer()),
-			CORS_ORIGIN: v.pipe(v.string(), v.url()),
+			CORS_ORIGIN: v.optional(v.pipe(v.string(), v.url())),
 			API_KEY: v.pipe(v.string(), v.nonEmpty()),
 		},
 	},

@@ -5,7 +5,6 @@ export const MESSAGE_CODE = {
 	MUST_BE_INTEGER: "must_be_integer",
 	MIN_VALUE: "min_value",
 	MAX_VALUE: "max_value",
-	CARD_DECLINED: "card_declined",
 } as const;
 
 export const HTTP_STATUS_CODE = {

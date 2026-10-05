@@ -12,9 +12,12 @@ export function errorHandler(
 		return res.status(err.statusCode).json({
 			code: err.code,
 			message: err.message,
-			...(err.details && { details: err.details }),
+			errors: err?.errors,
+			data: err?.data,
 		});
 	}
+
+	console.error(err);
 
 	return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({
 		code: "internal_server_error",

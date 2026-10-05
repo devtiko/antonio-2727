@@ -1,0 +1,33 @@
+meta {
+  name: top-up
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BASE_URL}}/top-up
+  body: json
+  auth: inherit
+}
+
+headers {
+  x-api-key: {{X-API-KEY}}
+}
+
+body:json {
+  {
+    "user_name": "Antonio Hau",
+    "user_email": "antoniohau@example.com",
+    "card_number": "1234123412341234",
+    "expiration_date": "12/26",
+    "cvv": "543",
+    "amount": 50,
+    "user_id": "18741a06-f41a-4a7b-90c7-037ec97571e6"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  forwardAuthorizationHeader: false
+}

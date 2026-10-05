@@ -1,7 +1,6 @@
-export type HttpExceptionArgs = {
+export type HttpExceptionArgs<TData = unknown> = {
 	code: string;
 	message: string;
-	details?: string[];
+	errors?: string[];
+	data?: TData;
 };
-
-export type HttpErrorArgs = Omit<HttpExceptionArgs, "statusCode">;
