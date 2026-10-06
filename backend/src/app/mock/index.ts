@@ -1,6 +1,6 @@
 import type { Database } from "../types";
 
-export const DATABSE: Database = {
+export const DATABASE: Database = {
 	cards: [
 		{
 			id: 1,

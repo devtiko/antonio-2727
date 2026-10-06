@@ -17,7 +17,7 @@ export function validate<TSchema extends v.GenericSchema>(
 			return res.status(HTTP_STATUS_CODE.UNPROCESSABLE_ENTITY).json({
 				code: "invalid_data",
 				message: "Invalid data",
-				erros: result.issues.map((issue) => {
+				errors: result.issues.map((issue) => {
 					const field = String(issue.path?.at(-1)?.key ?? "root");
 					return `${field}:${issue.message}`;
 				}),
