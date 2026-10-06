@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Outlet } from "react-router";
 import { AppFooter } from "./Footer";
 import { Header } from "./header/Header";
-import { TopUpModal } from "@/common/components/TopUpModal";
+import { TopUpModal } from "@/common/components/top-up-modal/modal";
 
 export function AppLayout() {
 	const [openTopUp, setOpenTopUp] = useState(false);
@@ -17,7 +17,6 @@ export function AppLayout() {
 			<TopUpModal
 				open={openTopUp}
 				onOpenChange={(value) => setOpenTopUp(value)}
-				onConfirm={() => {}}
 			/>
 		</>
 	);
