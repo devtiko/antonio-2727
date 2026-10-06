@@ -1,2 +1,1 @@
-# Solo usa paquetes publicados hace al menos 24h (1440 min) — protección anti-suministro
 minimumReleaseAge: 1440

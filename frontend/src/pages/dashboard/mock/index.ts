@@ -129,7 +129,6 @@ export const DONUT_STATS = {
 };
 
 export const RACE_TICKET_AMOUNTS = [10, 25, 50];
-export const SNAIL_PAY_AMOUNTS = [20, 50, 100, 250];
 
 export interface KpiStats {
 	gain: number;

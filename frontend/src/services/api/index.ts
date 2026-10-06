@@ -1,21 +1,21 @@
 import bcrypt from "bcryptjs";
+import { apiClient } from "./client";
 import { Storage } from "@/common/lib";
 import { ONE_DAY_MS } from "@/common/constants";
-import type { User, Session, UUID } from "@/common/types";
-import type { LoginInput, RegisterInput } from "./types/requests";
+import type { User, Session, UUID, Transaction } from "@/common/types";
+import type { LoginInput, RegisterInput, TopUpInput } from "./types/requests";
 import type { LoginResponse } from "./types/responses";
 
 export class ApiService {
 	static async login(body: LoginInput): Promise<LoginResponse> {
-		const usersEmailKey =
-			await Storage.get<Record<string, UUID>>("users_email_key");
+		const usersEmailKey = Storage.get<Record<string, UUID>>("users_email_key");
 		const userByEmail = usersEmailKey?.[body?.email];
 
 		if (!userByEmail) {
 			throw new Error("Correo y/o contraseña incorrectos");
 		}
 
-		const users = await Storage.get<Record<UUID, User>>("users");
+		const users = Storage.get<Record<UUID, User>>("users");
 		const userById = users?.[userByEmail];
 
 		if (!userById) {
@@ -37,7 +37,7 @@ export class ApiService {
 			expires_at: Date.now() + ONE_DAY_MS,
 		};
 
-		await Storage.set<Session>("session", newSession);
+		Storage.set<Session>("session", newSession);
 
 		if (userById?.password) {
 			delete userById.password;
@@ -49,8 +49,8 @@ export class ApiService {
 		};
 	}
 
-	static async me(): Promise<User> {
-		const session = await Storage.get<Session>("session");
+	static me(): User {
+		const session = Storage.get<Session>("session");
 
 		if (!session) {
 			throw new Error("No autenticado");
@@ -63,7 +63,7 @@ export class ApiService {
 			throw new Error("Sesión expirada");
 		}
 
-		const users = await Storage.get<Record<UUID, User>>("users");
+		const users = Storage.get<Record<UUID, User>>("users");
 		const userById = users?.[session?.user_id];
 
 		if (!users || !userById) {
@@ -84,8 +84,7 @@ export class ApiService {
 			throw new Error("Las contraseñas no coinciden");
 		}
 
-		const usersEmailKey =
-			await Storage.get<Record<string, UUID>>("users_email_key");
+		const usersEmailKey = Storage.get<Record<string, UUID>>("users_email_key");
 		const existsByEmail = !!usersEmailKey?.[email];
 
 		if (existsByEmail) {
@@ -115,24 +114,53 @@ export class ApiService {
 			expires_at: Date.now() + ONE_DAY_MS,
 		};
 
-		const users = await Storage.get<Record<string, User>>("users");
+		const users = Storage.get<Record<string, User>>("users");
 
 		Storage.set<Record<string, User>>("users", {
 			...users,
 			[userId]: { ...newUser, password: pwd },
 		});
-
 		Storage.set<Record<string, UUID>>("users_email_key", {
 			...usersEmailKey,
 			[email]: userId,
 		});
-
 		Storage.set<Session>("session", newSession);
 
 		return {
 			user: newUser,
 			session: newSession,
 		};
+	}
+
+	static saveTransaction(data: Transaction) {
+		const transactions =
+			Storage.get<Record<UUID, Transaction[]>>("user_transactions");
+		const transactionsByUser = transactions?.[data?.payer_id] ?? [];
+
+		transactionsByUser.push(data);
+
+		Storage.set<Record<UUID, Transaction[]>>("user_transactions", {
+			...transactions,
+			[data?.payer_id]: transactionsByUser,
+		});
+	}
+
+	static updateUser(id: UUID, data: Partial<User>) {
+		const users = Storage.get<Record<UUID, User>>("users");
+		const userById = users?.[id];
+		if (userById) {
+			Storage.set<Record<UUID, User>>("users", {
+				...users,
+				[id]: {
+					...userById,
+					...data,
+				},
+			});
+		}
+	}
+
+	static async topUp(body: TopUpInput) {
+		return apiClient.post<Transaction>("/top-up", body);
 	}
 
 	static logout() {
