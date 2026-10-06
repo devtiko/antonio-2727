@@ -1,6 +1,6 @@
 # antonio-2727
 
-TurboSnail — una aplicación web sencilla de apuestas en carreras de caracoles. Los usuarios pueden autenticarse, ver carreras y estadísticas en el dashboard, y recargar saldo a través de SnailPay, un procesador de pagos simulado.
+TurboSnail — una aplicación web sencilla de apuestas en carreras de caracoles. Los usuarios pueden autenticarse, ver carreras y estadísticas en el dashboard, y recargar saldo mediante un procesador de pagos simulado.
 
 ## Stack
 
@@ -115,7 +115,7 @@ cd frontend
 pnpm test
 ```
 
-## Simular problemas con SnailPay
+## Simular rechazos de pago
 
 El endpoint `POST /api/v1/top-up` simula distintos rechazos de pago. Requiere el header `x-api-key`.
 
