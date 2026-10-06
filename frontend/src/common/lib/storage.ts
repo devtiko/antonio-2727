@@ -1,17 +1,19 @@
-import { Crypto } from "./crypto";
+// import { Crypto } from "./crypto";
 
 export class Storage {
-	static async get<T>(key: string): Promise<T | null> {
+	static get<T>(key: string): T | null {
 		const value = localStorage.getItem(key);
 		if (!value) return null;
-		const decrypted = await Crypto.decrypt(value);
-		return JSON.parse(decrypted);
+		//Se desactiva para poder visualizar el storage
+		// const decrypted = await Crypto.decrypt(value);
+		return JSON.parse(value);
 	}
 
-	static async set<T>(key: string, value: T): Promise<void> {
+	static set<T>(key: string, value: T): void {
 		const serialized = JSON.stringify(value);
-		const encrypted = await Crypto.encrypt(serialized);
-		return localStorage.setItem(key, encrypted);
+		//Se desactiva para poder visualizar el storage
+		// const encrypted = await Crypto.encrypt(serialized);
+		return localStorage.setItem(key, serialized);
 	}
 
 	static remove(key: string): void {

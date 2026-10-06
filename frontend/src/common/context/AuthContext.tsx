@@ -5,8 +5,8 @@ import {
 	type ReactNode,
 	useEffect,
 } from "react";
-import { ApiService } from "../../services/api";
 import type { User } from "../types";
+import { ApiService } from "../../services/api";
 import { useNavigate } from "react-router";
 
 interface AuthContextValue {
@@ -32,7 +32,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		(async () => {
 			try {
 				setIsLoadingUser(true);
-				const response = await ApiService.me();
+				const response = ApiService.me();
 				setUser(response || null);
 			} catch (e: unknown) {
 				console.log(e);
@@ -45,7 +45,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		})();
 	}, []);
 
-	const updateUser = (data: Partial<User>) => {
+	const updateUser = async (data: Partial<User>) => {
 		setUser((prev) => {
 			if (!prev) return data;
 			return { ...prev, ...data };
