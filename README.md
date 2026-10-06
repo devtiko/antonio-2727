@@ -32,18 +32,18 @@ cp frontend/.env.template frontend/.env
 
 ## Configuración de entorno
 
-Genera una `API_KEY` con el prefijo `sp_test_` seguido de 64 caracteres hexadecimales (32 bytes):
+Genera una `API_KEY` con el prefijo `sp_` seguido de 64 caracteres hexadecimales (32 bytes):
 
 **Linux / macOS:**
 
 ```bash
-echo "sp_test_$(openssl rand -hex 32)"
+echo "sp_$(openssl rand -hex 32)"
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
-"sp_test_" + (-join ([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(32) | ForEach-Object { $_.ToString("x2") }))
+"sp_" + (-join ([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(32) | ForEach-Object { $_.ToString("x2") }))
 ```
 
 Luego completa los archivos `.env` con valores similares a estos:
@@ -119,11 +119,13 @@ pnpm test
 
 El endpoint `POST /api/v1/top-up` simula distintos rechazos de pago. Requiere el header `x-api-key`.
 
+Reemplaza `<uuid-del-usuario-existente>` por el UUID de un usuario registrado.
+
 Payload base (pago aprobado):
 
 ```json
 {
-  "user_id": "18741a06-f41a-4a7b-90c7-037ec97571e6",
+  "user_id": "<uuid-del-usuario-existente>",
   "user_email": "antoniohau@example.com",
   "card_number": "1234123412341234",
   "expiration_date": "12/26",
