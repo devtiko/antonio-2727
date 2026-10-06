@@ -10,5 +10,4 @@ export const DATABSE: Database = {
 			cvv: "543",
 		},
 	],
-	transactions: [],
 };

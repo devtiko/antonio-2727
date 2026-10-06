@@ -15,6 +15,11 @@ export function isExpired(
 	);
 }
 
+export function mask(value: string, visible = 0) {
+	const hidden = Math.max(value.length - visible, 0);
+	return "*".repeat(hidden) + value.slice(value.length - visible);
+}
+
 export function verifyPayment(body: TopUpDto, card: Card) {
 	return (
 		body.expiration_month === card?.expiration_month &&
