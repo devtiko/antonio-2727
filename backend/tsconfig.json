@@ -1,0 +1,27 @@
+{
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "CommonJS",
+		"rootDir": "./src",
+		"resolveJsonModule": true,
+		"sourceMap": true,
+		"outDir": "./dist",
+		"inlineSources": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"strict": true,
+		"noFallthroughCasesInSwitch": true,
+		"skipDefaultLibCheck": true,
+		"skipLibCheck": true,
+		"paths": {
+			"@app/*": ["./src/app/*"],
+			"@common/*": ["./src/common/*"],
+			"@config/*": ["./src/config/*"],
+			"@security/*": ["./src/security/*"],
+			"@server/*": ["./src/server/*"],
+		},
+	},
+	"include": ["src/**/*"],
+	"files": ["global.d.ts"],
+	"exclude": ["node_modules", "dist", "src/**/__test__/**"],
+}

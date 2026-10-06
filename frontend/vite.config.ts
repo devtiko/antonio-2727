@@ -1,11 +1,25 @@
-import react, { reactCompilerPreset } from '@vitejs/plugin-react'
-import babel from '@rolldown/plugin-babel'
-import { defineConfig } from 'vite'
+/// <reference types="vitest/config" />
+import react, { reactCompilerPreset } from "@vitejs/plugin-react";
+import babel from "@rolldown/plugin-babel";
+import tailwindcss from "@tailwindcss/vite";
+import svgr from "vite-plugin-svgr";
+import { defineConfig } from "vite";
+import path from "path";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-    babel({ presets: [reactCompilerPreset()] })
-  ],
-})
+	plugins: [
+		react(),
+		babel({ presets: [reactCompilerPreset()] }),
+		tailwindcss(),
+		svgr(),
+	],
+	resolve: {
+		alias: {
+			"@": path.resolve(import.meta.dirname, "./src"),
+		},
+	},
+	test: {
+		environment: "jsdom",
+	},
+});
